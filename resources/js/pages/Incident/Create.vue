@@ -679,7 +679,7 @@ async function onSubmit(values: any) {
                                                 type="text"
                                                 inputmode="decimal"
                                                 :model-value="formatCurrency(componentField.modelValue)"
-                                                @input="e => componentField.onChange(parseCurrency(e.target.value))"
+
                                                 class="pl-8"
                                                 placeholder="0.00"
                                             />
@@ -704,7 +704,7 @@ async function onSubmit(values: any) {
                                                 type="text"
                                                 inputmode="decimal"
                                                 :model-value="formatCurrency(componentField.modelValue)"
-                                                @input="e => componentField.onChange(parseCurrency(e.target.value))"
+
                                                 class="pl-8"
                                                 placeholder="0.00"
                                             />
@@ -729,7 +729,7 @@ async function onSubmit(values: any) {
                                                 type="text"
                                                 inputmode="decimal"
                                                 :model-value="formatCurrency(componentField.modelValue)"
-                                                @input="e => componentField.onChange(parseCurrency(e.target.value))"
+
                                                 class="pl-8"
                                                 placeholder="0.00"
                                             />
@@ -754,7 +754,7 @@ async function onSubmit(values: any) {
                                                 type="text"
                                                 inputmode="decimal"
                                                 :model-value="formatCurrency(componentField.modelValue)"
-                                                @input="e => componentField.onChange(parseCurrency(e.target.value))"
+
                                                 class="pl-8"
                                                 placeholder="0.00"
                                             />

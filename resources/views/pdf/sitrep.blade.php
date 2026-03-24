@@ -140,7 +140,7 @@
         <h3>a. Inside Evacuation Center</h3>
         <p style="margin-left: 40px;">
             There are <b>{{ $sitrep->affected_families }} families</b> or <b>{{ $sitrep->affected_individuals }} persons</b>
-            currently taking temporary shelter in <b>{{ $sitrep->open_ec }} evacuation center</b> in {{ $sitrep->province }}.
+            currently taking temporary shelter in <b>1 evacuation center</b> in {{ $sitrep->province }}.
         </p>
 
         <h3>b. Outside Evacuation Center</h3>

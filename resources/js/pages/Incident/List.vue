@@ -7,6 +7,7 @@ import { router } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import { ref } from 'vue'
 import View_Sitrep from './View_Sitrep.vue'
+import { Button } from '@/components/ui/button'
 
 
 import CreateSitrepModal from './Create.vue'
@@ -29,6 +30,21 @@ import {
   TableCell,
   TableCaption
 } from '@/components/ui/table'
+
+
+
+const handleAction = (sitrep) => {
+  if (sitrep.status === 'Approved Sitrep') {
+    createRecommendation(sitrep)
+  } else {
+    openModal(sitrep)
+  }
+}
+
+const createRecommendation = (sitrep) => {
+  // your logic here
+  console.log('Creating recommendation for:', sitrep)
+}
 
 const showModal = ref(false);
 const selectedSitrep = ref<Sitrep | null>(null)
@@ -55,14 +71,6 @@ const refreshData = () => {
   router.reload({ only: ['sitreps'] })
 }
 
-interface Sitrep {
-  id: number
-  province: string
-  municipality: string
-  barangay: string
-  incident_type: string
-  status: string
-}
 
 const props = defineProps<{
   sitreps?: {
@@ -130,10 +138,13 @@ const startIndex = computed(() => {
                         <TableCell class="font-medium">{{ sitrep.barangay }}</TableCell>
                         <TableCell class="font-medium">{{ sitrep.incident_type }}</TableCell>
                         <TableCell class="font-medium">{{ sitrep.status }}</TableCell>
-                        <TableCell class="font-medium text-blue-600 cursor-pointer"
-                        @click="openModal(sitrep)">View</TableCell>
-                        <TableCell class="font-medium text-blue-600 cursor-pointer"
-                        @click="printPdf(sitrep.id)">Print PDF</TableCell>
+                        <TableCell class="font-medium">
+                            <Button @click="handleAction(sitrep)" variant="outline">
+                           {{ sitrep.status === 'Approved Sitrep' ? 'Create Recommendation' : 'Review' }}
+                            </Button>
+                        </TableCell>
+                        <!-- <TableCell class="font-medium text-blue-600 cursor-pointer"
+                        @click="printPdf(sitrep.id)">Print PDF</TableCell> -->
                     </TableRow>
                 </TableBody>
             </Table>

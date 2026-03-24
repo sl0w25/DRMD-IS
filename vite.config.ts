@@ -25,14 +25,14 @@ export default defineConfig({
         }),
     ],
 
-    server: {
-    host: '0.0.0.0',
-    port: 5173,
-    https: false, // simpler for dev
-    cors: {
-        origin: 'http://172.31.37.155', // Laravel backend
-        methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-        credentials: true,
-    },
-    }
+    // server: {
+    // host: '0.0.0.0',
+    // port: 5173,
+    // https: false, // simpler for dev
+    // cors: {
+    //     origin: 'http://172.31.37.155', // Laravel backend
+    //     methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+    //     credentials: true,
+    // },
+    // }
 });

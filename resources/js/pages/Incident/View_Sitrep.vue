@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog_sitrep_view'
 import { Separator } from '@/components/ui/separator'
 import { ref, watch } from 'vue'
+import { computed } from 'vue'
 
 interface Sitrep {
   id: number
@@ -58,6 +59,18 @@ const close = () => {
 const edit = () => {
   emit('edit', props.sitrep)
 }
+
+const printPdf = (id: number) => {
+  window.open(`/minor_incident/${id}/print`, "_blank")
+}
+
+
+
+const startIndex = computed(() => {
+  const meta = props.sitreps?.meta
+  if (!meta) return 0
+  return (meta.current_page - 1) * meta.per_page
+})
 </script>
 
 <template>
@@ -145,9 +158,12 @@ const edit = () => {
         <DialogClose as-child>
           <Button variant="outline" @click="close">Close</Button>
         </DialogClose>
-        <!-- <Button @click="edit" class="bg-red-600 hover:bg-red-700 text-white">
-          Edit
-        </Button> -->
+        <Button @click="printPdf(sitrep.id)" class="bg-blue-600 hover:bg-blue-700 text-white">
+          View Sitrep
+        </Button>
+        <Button  class="bg-red-600 hover:bg-red-700 text-white">
+          Submit for Approval
+        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>
