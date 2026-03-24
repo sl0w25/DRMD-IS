@@ -39,4 +39,14 @@ class Sitrep extends Model
     'created_by',
     'reviewed_by'
 ];
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
 }

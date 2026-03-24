@@ -5,8 +5,18 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
+import axios from "axios";
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = 'http://127.0.0.1:8000';
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+axios.get('/sanctum/csrf-cookie')
+    .then(() => {
+        console.log('CSRF cookie set, ready for API requests')
+    })
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

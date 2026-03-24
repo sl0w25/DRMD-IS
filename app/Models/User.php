@@ -46,4 +46,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function createdSitreps()
+    {
+        return $this->hasMany(Sitrep::class, 'created_by');
+    }
+
+    public function reviewedSitreps()
+    {
+        return $this->hasMany(Sitrep::class, 'reviewed_by');
+    }
 }

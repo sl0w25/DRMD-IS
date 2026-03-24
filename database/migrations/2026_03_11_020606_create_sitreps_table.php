@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('ngo_cost')->nullable();
             $table->string('partners_cost')->nullable();
             $table->string('status')->default('For Review');
-            $table->string('created_by')->nullable();
+            $table->string('created_by');
             $table->string('reviewed_by')->nullable();
             $table->timestamps();
         });

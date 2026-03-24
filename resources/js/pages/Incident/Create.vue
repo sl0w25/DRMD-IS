@@ -222,6 +222,7 @@ async function onSubmit(values: any) {
 
   console.log(payload)
 
+    await axios.get('sanctum/csrf-cookie');
 
   try {
     await axios.post('/api/minor_incident/sitrep', payload)

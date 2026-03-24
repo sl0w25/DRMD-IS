@@ -36,8 +36,7 @@ class SitrepController extends Controller
       public function store(Request $request)
     {
 
-          $user = auth()->user();
-          Log::info('Authenticated User ID:', ['user_id' => $user]);
+          Log::info('Authenticated User ID:', ['user_id' => auth()->id()]);
           Log::info('Incoming QR Scan:', $request->all());
 
         $sitrep = Sitrep::create([
@@ -62,7 +61,7 @@ class SitrepController extends Controller
             'lgu_cost' => $request->lgu_cost,
             'ngo_cost' => $request->ngo_cost,
             'partners_cost' => $request->partners_cost,
-            'created_by' => $user,
+            'created_by' => auth()->id(),
         ]);
 
         return response()->json([

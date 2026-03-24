@@ -100,7 +100,7 @@ const edit = () => {
     <div class="space-y-2">
 
 
-        <div class="text-center mt-5">Status of Affected, Displaced, and Damaged Houses</div>
+        <div class="text-center mt-5 font-medium">Status of Affected, Displaced, and Damaged Houses</div>
 
 
     <Separator class="my-4" />
@@ -126,7 +126,7 @@ const edit = () => {
     </div>
 
     <Separator class="my-4" />
-        <div class="text-center py-2">Cost of Assistance</div>
+        <div class="text-center py-2 font-medium">Cost of Assistance</div>
     <div class="flex h-4 items-center space-x-20 text-m">
       <div class="font-medium ">DSWD: ₱{{ props.sitrep?.affected_families }}</div>
       <Separator orientation="vertical" />
