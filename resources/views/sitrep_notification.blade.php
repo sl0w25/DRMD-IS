@@ -1,4 +1,3 @@
-<h2>Sitrep #{{ $sitrep->id }} Submitted</h2>
 <p>{{ $messageContent }}</p>
 
 <h3>Incident Details:</h3>

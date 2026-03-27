@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SitrepNotificationMail extends Mailable
+class SitrepNotificationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -18,25 +18,26 @@ class SitrepNotificationMail extends Mailable
     public string $messageContent;
     public string $filePath;
 
-  public function __construct(Sitrep $sitrep, string $messageContent, string $filePath)
+    public function __construct($sitrep, $messageContent, $filePath)
     {
         $this->sitrep = $sitrep;
         $this->messageContent = $messageContent;
         $this->filePath = $filePath;
     }
 
-  public function build()
+    public function build()
     {
-        return $this->subject("Sitrep #{$this->sitrep->id} Notification")
-            ->view('emails.sitrep_notification')
-            ->with([
-                'sitrep' => $this->sitrep,
-                'messageContent' => $this->messageContent,
-            ])
-            ->attach($this->filePath, [
-                'as' => 'sitrep.pdf',
-                'mime' => 'application/pdf',
-            ]);
+        Log::info('PDF generated', [
+            'sitrep_id' => $this->sitrep->id,
+            'filePath' => $this->filePath
+        ]);
+
+        // New subject
+        $subject = 'Sitrep No. 1 on the '. $this->sitrep->incident_type .' in '. $this->sitrep->barangay .', '. $this->sitrep->municipality .', '. $this->sitrep->province;
+
+        return $this->subject($subject)
+                    ->view('sitrep_notification')
+                    ->attach($this->filePath);
     }
 
 
@@ -46,7 +47,7 @@ class SitrepNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Sitrep Notification Mail',
+            subject: ('Sitrep No. 1 on the '. $this->sitrep->incident_type .' in '. $this->sitrep->barangay .', '. $this->sitrep->municipality .', '. $this->sitrep->province),
         );
     }
 

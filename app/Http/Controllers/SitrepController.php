@@ -75,6 +75,8 @@ class SitrepController extends Controller
 
     public function submitAndEmail(Request $request, Sitrep $sitrep)
     {
+        Log::info('submitAndEmail START', ['sitrep_id' => $sitrep->id, 'user_id' => Auth::id()]);
+
         $request->validate([
             'email' => 'required|email',
             'message' => 'nullable|string',
@@ -82,29 +84,41 @@ class SitrepController extends Controller
 
         $messageContent = $request->input('message', 'No message provided');
 
-        // ✅ 1. Mark as submitted
-        $sitrep->submitted_by = auth()->id();
-        $sitrep->save();
+        try {
 
-        // ✅ 2. Generate PDF
-        $pdf = Pdf::loadView('pdf.sitrep', [
-            'sitrep' => $sitrep
-        ]);
+            $sitrep->submitted_by = Auth::id();
+            $sitrep->save();
+            Log::info('Sitrep marked as submitted', ['sitrep_id' => $sitrep->id]);
 
-        // ✅ 3. Save PDF to storage
-        $fileName = 'sitreps/sitrep_' . $sitrep->id . '.pdf';
-        Storage::disk('public')->put($fileName, $pdf->output());
 
-        $filePath = storage_path('app/public/' . $fileName);
+            $pdf = Pdf::loadView('pdf.sitrep', ['sitrep' => $sitrep]);
+            Log::info('PDF generated', ['sitrep_id' => $sitrep->id]);
 
-        // ✅ 4. Send email WITH attachment
-        Mail::to($request->email)
-            ->send(new SitrepNotificationMail($sitrep, $messageContent, $filePath));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sitrep submitted and email sent with PDF attachment',
-        ]);
+            $fileName = 'sitreps/for_approval/Sitrep_No_1_on_the_' . $sitrep->incident_type . '_in_' . $sitrep->barangay . '_' . $sitrep->municipality . '_' . $sitrep->province . '.pdf';
+            Storage::disk('public')->put($fileName, $pdf->output());
+            $filePath = storage_path('app/public/' . $fileName);
+            Log::info('PDF saved to storage', ['filePath' => $filePath]);
+
+
+            Mail::to($request->email)->send(new SitrepNotificationMail($sitrep, $messageContent, $filePath));
+            Log::info('Email sent successfully', ['to' => $request->email, 'sitrep_id' => $sitrep->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sitrep submitted and email sent with PDF attachment',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('submitAndEmail FAILED', [
+                'sitrep_id' => $sitrep->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to submit sitrep: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
 }
