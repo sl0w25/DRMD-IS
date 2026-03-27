@@ -49,4 +49,9 @@ class Sitrep extends Model
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
+
+    public function recommendation()
+    {
+        return $this->hasMany(RecommendationModel::class);
+    }
 }

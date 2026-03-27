@@ -22,5 +22,6 @@ Route::get('/api/municipalities/{province}', [LocationController::class, 'munici
 Route::get('/api/barangays/{municipality}', [LocationController::class, 'barangays']);
 
 require __DIR__. '/sitrep_route.php';
+require __DIR__. '/recommendation.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
