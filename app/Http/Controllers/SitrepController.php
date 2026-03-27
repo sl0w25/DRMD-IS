@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\SitrepNotificationMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class SitrepController extends Controller
 {
@@ -67,6 +70,40 @@ class SitrepController extends Controller
         return response()->json([
             'message' => 'Sitrep created',
             'data' => $sitrep
+        ]);
+    }
+
+    public function submitAndEmail(Request $request, Sitrep $sitrep)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'message' => 'nullable|string',
+        ]);
+
+        $messageContent = $request->input('message', 'No message provided');
+
+        // ✅ 1. Mark as submitted
+        $sitrep->submitted_by = auth()->id();
+        $sitrep->save();
+
+        // ✅ 2. Generate PDF
+        $pdf = Pdf::loadView('pdf.sitrep', [
+            'sitrep' => $sitrep
+        ]);
+
+        // ✅ 3. Save PDF to storage
+        $fileName = 'sitreps/sitrep_' . $sitrep->id . '.pdf';
+        Storage::disk('public')->put($fileName, $pdf->output());
+
+        $filePath = storage_path('app/public/' . $fileName);
+
+        // ✅ 4. Send email WITH attachment
+        Mail::to($request->email)
+            ->send(new SitrepNotificationMail($sitrep, $messageContent, $filePath));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sitrep submitted and email sent with PDF attachment',
         ]);
     }
 

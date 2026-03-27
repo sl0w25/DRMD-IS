@@ -4,15 +4,12 @@ import { minor_incident } from '@/routes'
 import { type BreadcrumbItem } from '@/types'
 import { Head } from '@inertiajs/vue3'
 import { router } from '@inertiajs/vue3'
-import { computed } from 'vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import View_Sitrep from './View_Sitrep.vue'
+import Submit_Sitrep from './Submit_Sitrep.vue'
+import CreateSitrepModal from './Create.vue'
 import { Button } from '@/components/ui/button'
 
-
-import CreateSitrepModal from './Create.vue'
-
-// ShadCN UI imports
 import {
   Card,
   CardHeader,
@@ -31,46 +28,9 @@ import {
   TableCaption
 } from '@/components/ui/table'
 
-
-
-const handleAction = (sitrep) => {
-  if (sitrep.status === 'Approved Sitrep') {
-    createRecommendation(sitrep)
-  } else {
-    openModal(sitrep)
-  }
-}
-
-const createRecommendation = (sitrep) => {
-  // your logic here
-  console.log('Creating recommendation for:', sitrep)
-}
-
-const showModal = ref(false);
-const selectedSitrep = ref<Sitrep | null>(null)
-
-const openModal = (sitrep: Sitrep) => {
-  selectedSitrep.value = sitrep
-  showModal.value = true
-}
-
-const printPdf = (id: number) => {
-  window.open(`/minor_incident/${id}/print`, "_blank")
-}
-
-const closeModal = () => {
-  showModal.value = false
-  selectedSitrep.value = null
-}
-
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Minor Incidents', href: minor_incident()?.url ?? '#' },
 ]
-
-const refreshData = () => {
-  router.reload({ only: ['sitreps'] })
-}
-
 
 const props = defineProps<{
   sitreps?: {
@@ -86,6 +46,65 @@ const startIndex = computed(() => {
   return (meta.current_page - 1) * meta.per_page
 })
 
+// Modal management
+const currentModal = ref<null | 'view' | 'submit'>(null)
+const currentSitrep = ref<Sitrep | null>(null)
+
+const openModal = (sitrep: Sitrep, type: 'view' | 'submit') => {
+  console.log('Opening modal:', type, sitrep.id)
+  currentSitrep.value = sitrep
+  currentModal.value = type
+}
+
+const closeModal = () => {
+  currentModal.value = null
+  currentSitrep.value = null
+}
+
+const refreshData = () => {
+  router.reload({ only: ['sitreps'] })
+}
+
+// Status and action labels
+const getStatusLabel = (sitrep: Sitrep) => {
+  if (!sitrep.submitted_by && !sitrep.reviewed_by && !sitrep.sitrep_file) return 'Sitrep For Review'
+  if (!sitrep.submitted_by && sitrep.reviewed_by) return 'Reviewed Sitrep'
+  if (sitrep.reviewed_by && sitrep.sitrep_file) return 'Approved Sitrep'
+  if (sitrep.submitted_by && sitrep.reviewed_by && !sitrep.sitrep_file) return 'Waiting For Approval'
+  return 'Review'
+}
+
+const getActionButtonLabel = (sitrep: Sitrep) => {
+  if (!sitrep.submitted_by && !sitrep.reviewed_by && !sitrep.sitrep_file) return 'Review'
+  if (!sitrep.submitted_by && sitrep.reviewed_by) return 'Submit For Approval'
+  if (sitrep.reviewed_by && sitrep.sitrep_file) return 'Create Recommendation'
+  if (sitrep.submitted_by && sitrep.reviewed_by && !sitrep.sitrep_file) return 'Track Sitrep'
+  return 'Review'
+}
+
+// Handle button actions
+const handleAction = (sitrep: Sitrep) => {
+  const label = getActionButtonLabel(sitrep)
+  console.log('Action label:', label)
+
+  switch (label) {
+    case 'Review':
+      openModal(sitrep, 'view') // opens View_Sitrep.vue
+      break
+    case 'Track Sitrep':
+         window.location.href = `/minor_incident/${sitrep.id}/track`
+      break
+    case 'Submit For Approval':
+      openModal(sitrep, 'submit') // opens Submit_Sitrep.vue
+      break
+    case 'Create Recommendation':
+      window.location.href = `/minor_incident/${sitrep.id}/recommendation`
+      break
+    default:
+      openModal(sitrep, 'view')
+      break
+  }
+}
 </script>
 
 <template>
@@ -94,19 +113,15 @@ const startIndex = computed(() => {
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex items-start justify-center mt-10">
       <Card class="w-full md:w-auto">
-
-        <!-- Header -->
         <CardHeader>
-          <CardTitle>List of Minor Incident</CardTitle>
+          <CardTitle>List of Minor Incidents</CardTitle>
           <CardDescription />
         </CardHeader>
 
-        <!-- Content -->
         <CardContent>
-
           <!-- Create Button -->
           <div class="flex justify-end mr-5 mb-3">
-            <CreateSitrepModal @saved="refreshData"/>
+            <CreateSitrepModal @saved="refreshData" />
           </div>
 
           <!-- Table -->
@@ -122,52 +137,63 @@ const startIndex = computed(() => {
                   <TableHead class="w-[300px]">Barangay</TableHead>
                   <TableHead class="w-[300px]">Type of Incident</TableHead>
                   <TableHead class="w-[200px]">Status</TableHead>
-                  <TableHead class="w-[30px]">Action</TableHead>
+                  <TableHead class="w-[150px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
 
-                <TableBody>
-                    <TableRow
-                        v-for="(sitrep, index) in props.sitreps?.data || []"
-                        :key="sitrep.id">
-                        <TableCell class="font-medium">
-                        {{ startIndex + index + 1 }}
-                        </TableCell>
-                        <TableCell class="font-medium">{{ sitrep.province }}</TableCell>
-                        <TableCell class="font-medium">{{ sitrep.municipality }}</TableCell>
-                        <TableCell class="font-medium">{{ sitrep.barangay }}</TableCell>
-                        <TableCell class="font-medium">{{ sitrep.incident_type }}</TableCell>
-                        <TableCell class="font-medium">{{ sitrep.status }}</TableCell>
-                        <TableCell class="font-medium">
-                            <Button @click="handleAction(sitrep)" variant="outline">
-                           {{ sitrep.status === 'Approved Sitrep' ? 'Create Recommendation' : 'Review' }}
-                            </Button>
-                        </TableCell>
-                        <!-- <TableCell class="font-medium text-blue-600 cursor-pointer"
-                        @click="printPdf(sitrep.id)">Print PDF</TableCell> -->
-                    </TableRow>
-                </TableBody>
+              <TableBody>
+                <TableRow
+                  v-for="(sitrep, index) in props.sitreps?.data || []"
+                  :key="sitrep.id"
+                >
+                  <TableCell class="font-medium">
+                    {{ startIndex + index + 1 }}
+                  </TableCell>
+                  <TableCell class="font-medium">{{ sitrep.province }}</TableCell>
+                  <TableCell class="font-medium">{{ sitrep.municipality }}</TableCell>
+                  <TableCell class="font-medium">{{ sitrep.barangay }}</TableCell>
+                  <TableCell class="font-medium">{{ sitrep.incident_type }}</TableCell>
+                  <TableCell class="font-medium">{{ getStatusLabel(sitrep) }}</TableCell>
+                  <TableCell class="font-medium">
+                    <Button @click="handleAction(sitrep)" variant="outline">
+                      {{ getActionButtonLabel(sitrep) }}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
             </Table>
 
+            <!-- Modals -->
             <View_Sitrep
-            :show="showModal"
-            :sitrep="selectedSitrep"
-            @close="closeModal"
-            @edit="openEditModal"  />
+              v-if="currentModal === 'view'"
+              :sitrep="currentSitrep"
+              :show="currentModal === 'view'"
+              @close="closeModal"
+            />
+            <Submit_Sitrep
+              v-if="currentModal === 'submit'"
+              :sitrep="currentSitrep"
+              :show="currentModal === 'submit'"
+              @close="closeModal"
+              @saved="refreshData"
+            />
 
-
+            <!-- Pagination -->
             <div class="flex justify-end mt-4 space-x-2">
-                <button
-                    v-for="link in props.sitreps.links"
-                    :key="link.label"
-                    v-html="link.label"
-                    :disabled="!link.url"
-                    :class="['px-3 py-1 rounded', link.active ? 'bg-blue-500 text-white' : 'bg-gray-200', !link.url && 'opacity-50 cursor-not-allowed']"
-                    @click.prevent="link.url && $inertia.get(link.url)"
-                ></button>
+              <button
+                v-for="link in props.sitreps?.links || []"
+                :key="link.label"
+                v-html="link.label"
+                :disabled="!link.url"
+                :class="[
+                  'px-3 py-1 rounded',
+                  link.active ? 'bg-blue-500 text-white' : 'bg-gray-200',
+                  !link.url && 'opacity-50 cursor-not-allowed'
+                ]"
+                @click.prevent="link.url && $inertia.get(link.url)"
+              ></button>
             </div>
           </div>
-
         </CardContent>
       </Card>
     </div>

@@ -36,8 +36,10 @@ return new class extends Migration
             $table->string('ngo_cost')->nullable();
             $table->string('partners_cost')->nullable();
             $table->string('status')->default('For Review');
+            $table->string('submitted_by')->default(false);
             $table->string('created_by');
             $table->string('reviewed_by')->nullable();
+            $table->text('sitrep_file')->nullable();
             $table->timestamps();
         });
     }

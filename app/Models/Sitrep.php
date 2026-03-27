@@ -36,8 +36,10 @@ class Sitrep extends Model
     'partners_cost',
 
     'status',
+    'submitted_by',
     'created_by',
-    'reviewed_by'
+    'reviewed_by',
+    'sitrep_file'
 ];
 
     public function creator()
