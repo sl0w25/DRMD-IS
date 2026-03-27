@@ -23,7 +23,7 @@ interface Sitrep {
   status: string
   overview: string
   affected_families: string
-  affected_individual: string
+  affected_individuals: string
   totally_damaged: string
   partially_damaged: string
   displaced_family: string
@@ -162,7 +162,7 @@ const startIndex = computed(() => {
           View Sitrep
         </Button>
         <Button  class="bg-red-600 hover:bg-red-700 text-white">
-          Submit for Approval
+           {{ props.sitrep?.reviewed_by === null ? 'Revise' : 'Submit for Approval' }}
         </Button>
       </DialogFooter>
     </DialogContent>
