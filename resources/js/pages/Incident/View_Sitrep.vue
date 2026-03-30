@@ -102,11 +102,14 @@ const printPdf = (id: number) => {
 
       <DialogFooter class="space-x-2">
         <DialogClose as-child>
+        <Button @click="props.sitrep && printPdf(props.sitrep.id)" class="bg-blue-600 hover:bg-blue-700 text-white">
+          Print Sitrep
+        </Button>
+        <Button @click="props.sitrep && printPdf(props.sitrep.id)" class="bg-green-600 hover:bg-green-700 text-white">
+          Review Sitrep
+        </Button>
           <Button variant="outline" @click="close">Close</Button>
         </DialogClose>
-        <Button @click="props.sitrep && printPdf(props.sitrep.id)" class="bg-blue-600 hover:bg-blue-700 text-white">
-          View Sitrep
-        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

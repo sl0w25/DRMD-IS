@@ -8,6 +8,7 @@ import { computed, ref } from 'vue'
 import View_Sitrep from './View_Sitrep.vue'
 import Submit_Sitrep from './Submit_Sitrep.vue'
 import CreateSitrepModal from './Create.vue'
+import UploadApprovedSitrep from './UploadApprovedSitrep.vue'
 import { Button } from '@/components/ui/button'
 
 import {
@@ -47,10 +48,10 @@ const startIndex = computed(() => {
 })
 
 // Modal management
-const currentModal = ref<null | 'view' | 'submit'>(null)
+const currentModal = ref<null | 'view' | 'submit' | 'upload'>(null)
 const currentSitrep = ref<Sitrep | null>(null)
 
-const openModal = (sitrep: Sitrep, type: 'view' | 'submit') => {
+const openModal = (sitrep: Sitrep, type: 'view' | 'submit' | 'upload') => {
   console.log('Opening modal:', type, sitrep.id)
   currentSitrep.value = sitrep
   currentModal.value = type
@@ -78,7 +79,7 @@ const getActionButtonLabel = (sitrep: Sitrep) => {
   if (!sitrep.submitted_by && !sitrep.reviewed_by && !sitrep.sitrep_file) return 'Review'
   if (!sitrep.submitted_by && sitrep.reviewed_by) return 'Submit For Approval'
   if (sitrep.reviewed_by && sitrep.sitrep_file) return 'Create Recommendation'
-  if (sitrep.submitted_by && sitrep.reviewed_by && !sitrep.sitrep_file) return 'Track Sitrep'
+  if (sitrep.submitted_by && sitrep.reviewed_by && !sitrep.sitrep_file) return 'Upload Approved Sitrep'
   return 'Review'
 }
 
@@ -91,14 +92,14 @@ const handleAction = (sitrep: Sitrep) => {
     case 'Review':
       openModal(sitrep, 'view') // opens View_Sitrep.vue
       break
-    case 'Track Sitrep':
-         window.location.href = `/minor_incident/${sitrep.id}/track`
+    case 'Upload Approved Sitrep':
+        openModal(sitrep, 'upload')
       break
     case 'Submit For Approval':
       openModal(sitrep, 'submit') // opens Submit_Sitrep.vue
       break
     case 'Create Recommendation':
-      window.location.href = `/minor_incident/${sitrep.id}/recommendation`
+      window.location.href = `/#`
       break
     default:
       openModal(sitrep, 'view')
@@ -176,6 +177,14 @@ const handleAction = (sitrep: Sitrep) => {
               :show="currentModal === 'submit'"
               @close="closeModal"
               @saved="refreshData"
+            />
+
+            <UploadApprovedSitrep
+            v-if="currentModal === 'upload'"
+            :sitrep="currentSitrep"
+            :show="currentModal === 'upload'"
+            @close="closeModal"
+            @uploaded="refreshData"
             />
 
             <!-- Pagination -->

@@ -11,11 +11,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::get('/api/municipalities/{province}', [LocationController::class, 'municipalities']);
 
-Route::get('/api/barangays/{municipality}', [LocationController::class, 'barangays']);
 
-Route::post('/minor_incident/sitrep', [SitrepController::class, 'store']);
 
-Route::post('/sitreps/{sitrep}/submit', [SitrepController::class, 'submitAndEmail']);
 

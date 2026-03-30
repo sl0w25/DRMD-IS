@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Button } from '@/components/ui/button'
+import axios from 'axios'
 import {
   Dialog,
   DialogClose,
@@ -62,35 +63,30 @@ const submitSitrep = async () => {
   loading.value = true
 
   try {
-    console.log('Submitting sitrep:', props.sitrep.id)
-    console.log('Sending email to:', email.value)
 
-    const res = await fetch(`/api/sitreps/${props.sitrep.id}/submit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
+    await axios.get('/sanctum/csrf-cookie', { withCredentials: true })
+
+
+    const res = await axios.post(`/sitreps/${props.sitrep.id}/submit`,
+      {
         email: email.value,
         message: message.value,
-      }),
-    })
+      },
+      {
+        withCredentials: true,
+        headers: {
+          Accept: 'application/json',
+        },
+      }
+    )
 
-    const data = await res.json()
-
-    if (!res.ok) {
-      throw new Error(data.message || 'Something went wrong')
-    }
-
-    alert(data.message)
-
+    alert(res.data.message)
     emit('saved', props.sitrep)
     closeModal()
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error:', error)
-    alert('Failed to submit sitrep')
+    alert(error.response?.data?.message || 'Failed to submit sitrep')
   } finally {
     loading.value = false
   }

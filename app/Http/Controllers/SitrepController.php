@@ -39,6 +39,8 @@ class SitrepController extends Controller
       public function store(Request $request)
     {
 
+          $user = $request->user();
+          Log::info('user id' . $user->id);
           Log::info('Authenticated User ID:', ['user_id' => auth()->id()]);
           Log::info('Incoming QR Scan:', $request->all());
 
@@ -75,7 +77,8 @@ class SitrepController extends Controller
 
     public function submitAndEmail(Request $request, Sitrep $sitrep)
     {
-        Log::info('submitAndEmail START', ['sitrep_id' => $sitrep->id, 'user_id' => Auth::id()]);
+        $user = $request->user();
+        Log::info('user id' . $user->id);
 
         $request->validate([
             'email' => 'required|email',
@@ -86,7 +89,7 @@ class SitrepController extends Controller
 
         try {
 
-            $sitrep->submitted_by = Auth::id();
+            $sitrep->submittedBy()->associate($request->user());
             $sitrep->save();
             Log::info('Sitrep marked as submitted', ['sitrep_id' => $sitrep->id]);
 
@@ -119,6 +122,30 @@ class SitrepController extends Controller
                 'message' => 'Failed to submit sitrep: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function UploadApprovedSitrep(Request $request, Sitrep $sitrep)
+    {
+        $request->validate([
+            'file' => 'required|mimes:pdf|max:5120', // max 5 MB
+            'comments' => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('sitreps/approved', 'public');
+
+            // Save the path in the database
+            $sitrep->sitrep_file = $path;
+            $sitrep->save();
+
+            return response()->json([
+                'message' => 'Approved Sitrep uploaded successfully!',
+                'path' => $path,
+            ]);
+        }
+
+        return response()->json(['message' => 'No file uploaded'], 422);
     }
 
 }

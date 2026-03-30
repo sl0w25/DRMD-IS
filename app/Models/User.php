@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Sitrep::class, 'reviewed_by');
     }
+
+        public function submittedSitreps()
+    {
+        return $this->hasMany(Sitrep::class, 'submitted_by');
+    }
 }

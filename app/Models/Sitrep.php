@@ -42,13 +42,18 @@ class Sitrep extends Model
     'sitrep_file'
 ];
 
-    public function creator()
+    public function createBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function reviewer()
+    public function reviewerBy()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function submittedBy()
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
     }
 }
