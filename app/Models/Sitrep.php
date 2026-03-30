@@ -40,18 +40,24 @@ class Sitrep extends Model
     'reviewed_by'
 ];
 
-    public function creator()
+    public function createBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function reviewer()
+    public function reviewerBy()
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+<<<<<<< HEAD
     public function recommendation()
     {
         return $this->hasMany(RecommendationModel::class);
+=======
+    public function submittedBy()
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
+>>>>>>> 1e2c656c6a583bd698a746a432ef8ce29f6c791c
     }
 }

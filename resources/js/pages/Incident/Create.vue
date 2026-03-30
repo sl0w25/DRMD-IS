@@ -222,10 +222,18 @@ async function onSubmit(values: any) {
 
   console.log(payload)
 
-    await axios.get('sanctum/csrf-cookie');
+   await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+    withCredentials: true
+  })
 
   try {
-    await axios.post('/api/minor_incident/sitrep', payload)
+    await axios.post('http://127.0.0.1:8000/minor_incident/sitrep', payload, {
+        withCredentials: true,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
 
     await Swal.fire({
         toast: true,

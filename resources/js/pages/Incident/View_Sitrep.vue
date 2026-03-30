@@ -156,14 +156,23 @@ const startIndex = computed(() => {
 
       <DialogFooter class="space-x-2">
         <DialogClose as-child>
+        <Button @click="props.sitrep && printPdf(props.sitrep.id)" class="bg-blue-600 hover:bg-blue-700 text-white">
+          Print Sitrep
+        </Button>
+        <Button @click="props.sitrep && printPdf(props.sitrep.id)" class="bg-green-600 hover:bg-green-700 text-white">
+          Review Sitrep
+        </Button>
           <Button variant="outline" @click="close">Close</Button>
         </DialogClose>
+<<<<<<< HEAD
         <Button @click="printPdf(sitrep.id)" class="bg-blue-600 hover:bg-blue-700 text-white">
           View Sitrep
         </Button>
         <Button  class="bg-red-600 hover:bg-red-700 text-white">
            {{ props.sitrep?.reviewed_by === null ? 'Revise' : 'Submit for Approval' }}
         </Button>
+=======
+>>>>>>> 1e2c656c6a583bd698a746a432ef8ce29f6c791c
       </DialogFooter>
     </DialogContent>
   </Dialog>
